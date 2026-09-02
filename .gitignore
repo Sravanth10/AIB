@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# runtime state — recreated by `npm run demo`, not source
+data/uploads/
+data/analyses/
+
+# the synthetic source files ARE committed (data/seed, data/holdback) so the repo is
+# self-contained and the demo runs straight after clone.
+
+# local env
+.env
+.env.local
+
+# editor / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

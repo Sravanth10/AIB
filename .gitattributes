@@ -1,0 +1,12 @@
+# Later rules win in gitattributes, so the general default goes first and the specific
+# overrides follow it.
+* text=auto
+
+*.pdf binary
+*.xlsx binary
+*.xls binary
+
+# Synthetic source files are fixtures — they must survive a clone byte-for-byte, including
+# the CRLF line endings that make the AWS Connect export look like the real thing.
+data/seed/** -text
+data/holdback/** -text

@@ -1,0 +1,29 @@
+{
+  "name": "aib-life-proto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AIB Life - Phase 1 SLA governance prototype",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "server": "node server/index.js",
+    "build": "vite build",
+    "preview": "npm run build && node server/index.js",
+    "seed": "node scripts/seed.js",
+    "reset": "node scripts/reset.js",
+    "demo": "node scripts/prepare-demo.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "multer": "^2.3.0",
+    "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.15.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.2.2"
+  }
+}
