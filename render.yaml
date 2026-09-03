@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: aib-life-proto
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run server
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
