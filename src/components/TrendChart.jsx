@@ -9,7 +9,7 @@ const RAG_COLOUR = { GREEN: '#2e9e7b', AMBER: '#e59a3c', RED: '#dc4c64', NO_DATA
  * annotations, so "how close are we to breaching" is legible without reading any numbers —
  * the line entering the band IS the finding.
  */
-export default function TrendChart({ trend, height = 210 }) {
+export default function TrendChart({ trend, height = 230 }) {
   const points = trend.points.filter((p) => p.value != null);
   if (points.length < 2) {
     return <div className="empty" style={{ padding: 40 }}><p>Not enough history to chart this metric yet.</p></div>;
@@ -17,7 +17,7 @@ export default function TrendChart({ trend, height = 210 }) {
 
   const W = 720;
   const H = height;
-  const pad = { top: 18, right: 18, bottom: 30, left: 52 };
+  const pad = { top: 22, right: 18, bottom: 34, left: 58 };
   const innerW = W - pad.left - pad.right;
   const innerH = H - pad.top - pad.bottom;
 
@@ -69,7 +69,7 @@ export default function TrendChart({ trend, height = 210 }) {
         {/* target line */}
         <line x1={pad.left} x2={pad.left + innerW} y1={yTarget} y2={yTarget}
               stroke="#2e9e7b" strokeWidth="1.4" strokeDasharray="5 4" />
-        <text x={pad.left - 8} y={yTarget + 3.5} textAnchor="end" fontSize="9.5" fill="#2e9e7b" fontWeight="600">
+        <text x={pad.left - 8} y={yTarget + 3.5} textAnchor="end" fontSize="11" fill="#2e9e7b" fontWeight="700">
           {fmtValue(trend.target, trend.unit)}
         </text>
 
@@ -83,10 +83,10 @@ export default function TrendChart({ trend, height = 210 }) {
         {points.map((p, i) => (
           <g key={p.month}>
             <circle cx={x(i)} cy={y(p.value)} r="5.5" fill="#fff" stroke={RAG_COLOUR[p.rag]} strokeWidth="2.6" />
-            <text x={x(i)} y={pad.top + innerH + 17} textAnchor="middle" fontSize="9.5" fill="#7b74a3">
+            <text x={x(i)} y={pad.top + innerH + 17} textAnchor="middle" fontSize="11.5" fill="#7b74a3">
               {p.label.split(' ')[0].slice(0, 3)}
             </text>
-            <text x={x(i)} y={y(p.value) - 12} textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#241d47">
+            <text x={x(i)} y={y(p.value) - 12} textAnchor="middle" fontSize="11.5" fontWeight="700" fill="#241d47">
               {fmtValue(p.value, trend.unit)}
             </text>
           </g>
