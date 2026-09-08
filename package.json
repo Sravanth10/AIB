@@ -11,10 +11,12 @@
     "preview": "npm run build && node server/index.js",
     "seed": "node scripts/seed.js",
     "reset": "node scripts/reset.js",
-    "demo": "node scripts/prepare-demo.js"
+    "demo": "node scripts/prepare-demo.js",
+    "bedrock:check": "node scripts/check-bedrock.js"
   },
   "dependencies": {
     "@anthropic-ai/bedrock-sdk": "^0.33.4",
+    "@aws-sdk/client-bedrock-runtime": "^3.1127.0",
     "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "multer": "^2.3.0",
