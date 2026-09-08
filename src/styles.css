@@ -651,18 +651,90 @@ p { margin: 0; }
 @media (max-width: 1180px) { .intel-grid { grid-template-columns: 1fr; } }
 
 .narrative-card {
-  border-radius: var(--radius); padding: 26px 28px; color: #fff;
-  background: linear-gradient(128deg, var(--violet-600) 0%, var(--violet-700) 48%, var(--violet-800) 100%);
-  box-shadow: 0 16px 44px rgba(70, 45, 180, 0.26);
+  position: relative; overflow: hidden;
+  border-radius: 26px; padding: 28px 30px 26px; color: #fff;
+  background:
+    radial-gradient(120% 90% at 8% 0%, rgba(184, 184, 255, 0.32) 0%, transparent 55%),
+    linear-gradient(128deg, var(--violet-600) 0%, var(--violet-700) 46%, var(--violet-800) 100%);
+  box-shadow: 0 18px 52px rgba(60, 38, 170, 0.3);
 }
-.narrative-card h2 { font-size: 15px; }
-.narrative-meta { font-size: 10.5px; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 620; }
-.narrative-text { margin-top: 15px; font-size: 13.5px; line-height: 1.78; color: rgba(255, 255, 255, 0.93); }
-.narrative-text p + p { margin-top: 13px; }
+
+/* Warm counterweight in the corner, so the card is not a flat slab of violet. */
+.narrative-glow {
+  position: absolute; right: -90px; top: -110px; width: 340px; height: 340px;
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 216, 190, 0.3) 0%, transparent 66%);
+}
+
+.narrative-top {
+  position: relative; display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px; margin-bottom: 20px;
+}
+.narrative-top h2 { font-size: 15.5px; letter-spacing: -0.02em; }
+.narrative-mark {
+  width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
+  background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.24);
+  flex: 0 0 32px;
+}
+.narrative-scope {
+  font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6); font-weight: 620; margin-top: 3px;
+}
 .narrative-source {
-  display: inline-flex; align-items: center; gap: 6px; margin-top: 17px;
-  font-size: 10.5px; font-weight: 600; padding: 4px 11px; border-radius: 999px;
-  background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 10px; font-weight: 600; padding: 5px 12px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.84); white-space: nowrap;
+}
+
+/* ------------------------------------------------------------- verdict */
+
+.verdict {
+  position: relative; display: grid; grid-template-columns: auto 1fr; gap: 14px;
+  align-items: center; padding: 16px 20px; border-radius: 18px; margin-bottom: 22px;
+  background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.verdict.tone-severe { background: rgba(255, 216, 190, 0.19); border-color: rgba(255, 216, 190, 0.46); }
+.verdict.tone-clear { background: rgba(163, 240, 210, 0.15); border-color: rgba(163, 240, 210, 0.36); }
+.verdict-icon {
+  width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
+  background: rgba(255, 255, 255, 0.18);
+}
+.verdict.tone-severe .verdict-icon { background: var(--apricot); color: #8a4f14; }
+.verdict.tone-clear .verdict-icon { background: #d4f5e7; color: #14724f; }
+.verdict-headline { font-size: 17px; font-weight: 680; letter-spacing: -0.025em; line-height: 1.32; }
+.verdict-detail { font-size: 11.5px; color: rgba(255, 255, 255, 0.72); margin-top: 5px; line-height: 1.5; }
+
+/* --------------------------------------------------------- narrative body */
+
+.narrative-body { position: relative; display: flex; flex-direction: column; gap: 18px; }
+.narrative-body p { font-size: 13.5px; line-height: 1.75; color: rgba(255, 255, 255, 0.92); margin: 0; }
+
+/* Figures are what a governance reader scans for, so they sit slightly proud of the prose. */
+.narrative-body .fig {
+  font-weight: 700; color: #fff; font-variant-numeric: tabular-nums;
+  background: rgba(255, 255, 255, 0.14); padding: 1px 5px; border-radius: 5px;
+  box-decoration-break: clone; -webkit-box-decoration-break: clone;
+}
+
+.narrative-body.is-labelled { gap: 20px; }
+.narrative-body.is-labelled .narrative-para {
+  padding-left: 17px; border-left: 2px solid rgba(255, 255, 255, 0.22);
+}
+.para-marker { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+.para-num {
+  width: 19px; height: 19px; border-radius: 6px; display: grid; place-items: center;
+  font-size: 10px; font-weight: 750; background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+.para-label {
+  font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; font-weight: 680;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+@media (max-width: 720px) {
+  .narrative-card { padding: 22px 20px; }
+  .verdict { grid-template-columns: 1fr; }
+  .verdict-headline { font-size: 15px; }
 }
 
 /* ------------------------------------------------------- ask-the-report */
