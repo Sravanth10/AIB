@@ -21,3 +21,9 @@ data/analyses/
 .DS_Store
 Thumbs.db
 *.log
+
+# local scratch / deployment working files
+*.zip
+b64*.txt
+log*.txt
+console.json
