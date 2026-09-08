@@ -14,6 +14,13 @@ import { listSampleFiles, monthLabel } from './store.js';
  * built by hand. Called both by `npm run demo` and by the server on a cold start.
  */
 export const DEMO_PLAN = [
+  // Phase 2 backfill — a continuous six-month history for the intelligence layer to read.
+  // Tagged as backfill in the stored analysis so provenance stays honest, though the UI
+  // does not distinguish them.
+  { month: '2026-04', include: 'all', provenance: 'synthetic-backfill' },
+  { month: '2026-05', include: 'all', provenance: 'synthetic-backfill' },
+  { month: '2026-06', include: 'all', provenance: 'synthetic-backfill' },
+  // Produced through the Phase 1 demo flow.
   { month: '2026-07', include: 'all' },
   { month: '2026-08', include: 'not-held-back' },
 ];
@@ -32,7 +39,7 @@ export async function prepareDemo({ log = () => {} } = {}) {
       step.month,
       files.map((f) => ({ originalName: f.name, buffer: fs.readFileSync(f.absolute) })),
     );
-    const analysis = await generate(step.month);
+    const analysis = await generate(step.month, { provenance: step.provenance });
     const s = analysis.summary;
 
     log(

@@ -1,4 +1,4 @@
-import { locateGrid, col, toNum, toDate, mean, round, coverageOf } from './util.js';
+import { locateGrid, col, toNum, toDate, mean, round, coverageOf, breakdown } from './util.js';
 
 /**
  * Manual complaints tracker -> metric 14.
@@ -66,8 +66,18 @@ export function adaptTracker(doc) {
     metrics.MAN_COMPLAINT_TAT = { value: round(mean(closedCases.map((c) => c.days)), 2), sampleSize: closedCases.length };
   }
 
+  const cOwner = col(grid.headers, 'owner');
+  const breakdowns = [
+    ...breakdown(closedCases, {
+      metricId: 'MAN_COMPLAINT_TAT', dimension: 'complaint category',
+      keyFn: (c) => c.category, valueFn: (c) => c.days,
+    }),
+  ];
+
   return {
     metrics,
+    breakdowns,
+    demand: { complaintsLogged: cases.length, closed: closedCases.length },
     coverage: coverageOf(dates),
     stats: {
       records: cases.length,

@@ -65,6 +65,37 @@ export const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.leng
 export const sum = (xs) => xs.reduce((a, b) => a + b, 0);
 export const round = (v, dp = 2) => (v == null ? null : Math.round(v * 10 ** dp) / 10 ** dp);
 
+/**
+ * Break a metric down by one record-level dimension - branch, queue, service, category.
+ *
+ * This is what Phase 2's root-cause clustering consumes. The monthly headline figure says
+ * a metric is in trouble; these say WHERE, and a dimension whose value is consistently
+ * worse than the metric mean across several months is a recurring failure point rather
+ * than a bad month.
+ *
+ * `rows` is any array; keyFn returns the dimension value, valueFn the metric contribution.
+ * Groups below `minRecords` are dropped so a single stray record cannot masquerade as a
+ * systemic pattern.
+ */
+export function breakdown(rows, { metricId, dimension, keyFn, valueFn, aggregate = 'mean', minRecords = 3 }) {
+  const groups = new Map();
+  for (const row of rows) {
+    const key = String(keyFn(row) ?? '').trim();
+    const value = valueFn(row);
+    if (!key || value == null || Number.isNaN(value)) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(value);
+  }
+
+  const out = [];
+  for (const [key, values] of groups) {
+    if (values.length < minRecords) continue;
+    const agg = aggregate === 'sum' ? sum(values) : aggregate === 'rate' ? (sum(values) / values.length) * 100 : mean(values);
+    out.push({ metricId, dimension, key, records: values.length, value: round(agg, 2) });
+  }
+  return out.sort((a, b) => b.value - a.value);
+}
+
 /** Coverage window of a set of dates - drives the stale-data check. */
 export function coverageOf(dates) {
   const valid = dates.filter(Boolean).sort((a, b) => a - b);

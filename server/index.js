@@ -6,6 +6,8 @@ import multer from 'multer';
 import { SOURCE_TEMPLATES, templateById } from './classify.js';
 import { SLA_METRICS } from './slaEngine.js';
 import { ingest, generate } from './pipeline.js';
+import { buildIntelligence } from './intelligence.js';
+import { generateNarrative, narrativeStatus } from './narrative.js';
 import {
   ROOT, listMonths, monthLabel, isMonthKey, createSpace, currentMonthKey,
   readUploadIndex, writeUploadIndex, readAnalysis, deleteUploadFile, listSampleFiles,
@@ -140,6 +142,26 @@ app.get('/api/analysis/:month', (req, res) => {
   const a = readAnalysis(month);
   if (!a) return fail(res, 404, 'No pack has been generated for this period yet');
   res.json(a);
+});
+
+/**
+ * Phase 2 — operational intelligence over the whole history.
+ * `scope` is 'all' or a month key; a month narrows the window to that month and everything
+ * before it, so a past period is analysed with the context that existed at the time.
+ */
+app.get('/api/intelligence', async (req, res) => {
+  const scope = req.query.scope && req.query.scope !== 'all' ? String(req.query.scope) : 'all';
+  if (scope !== 'all' && !isMonthKey(scope)) return fail(res, 400, 'Invalid scope');
+
+  try {
+    const intel = buildIntelligence({ scope });
+    if (intel.empty) return res.json({ ...intel, narrative: null, narrativeStatus: narrativeStatus() });
+
+    const narrative = await generateNarrative(intel, { refresh: req.query.refresh === '1' });
+    res.json({ ...intel, narrative, narrativeStatus: narrativeStatus() });
+  } catch (err) {
+    fail(res, 500, err.message);
+  }
 });
 
 // Serve the built frontend when one exists, so the demo can run from a single process.

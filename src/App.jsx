@@ -5,8 +5,9 @@ import Ingest from './views/Ingest.jsx';
 import Consolidated from './views/Consolidated.jsx';
 import Exceptions from './views/Exceptions.jsx';
 import Pack from './views/Pack.jsx';
+import Intelligence from './views/Intelligence.jsx';
 import Logo from './components/Logo.jsx';
-import { IconCloud, IconGrid, IconAlert, IconDoc, IconClock, IconLayers } from './components/Icons.jsx';
+import { IconCloud, IconGrid, IconAlert, IconDoc, IconClock, IconLayers, IconSpark } from './components/Icons.jsx';
 import { fmtStamp, relativeTime } from './lib/format.js';
 
 const VIEWS = [
@@ -34,6 +35,7 @@ export default function App() {
   const [view, setView] = useState('ingest');
   const [generating, setGenerating] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [intelOpen, setIntelOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [error, setError] = useState(null);
 
@@ -56,11 +58,16 @@ export default function App() {
   // and a specific period's pack can be linked to directly.
   useEffect(() => {
     const apply = () => {
-      const [m, v] = window.location.hash.replace('#', '').split('/');
+      const raw = window.location.hash.replace('#', '');
+      // A trailing /intel opens the intelligence panel over whatever is underneath.
+      const wantsIntel = raw === 'intelligence' || raw.endsWith('/intel');
+      setIntelOpen(wantsIntel);
+
+      const [m, v] = raw.replace(/\/intel$/, '').split('/');
       if (/^\d{4}-\d{2}$/.test(m)) {
         setMonth(m);
         if (VIEWS.some((x) => x.id === v)) setView(v);
-      } else {
+      } else if (raw !== 'intelligence') {
         setMonth(null);
       }
     };
@@ -70,9 +77,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const want = month ? `#${month}/${view}` : '#dashboard';
+    const base = month ? `${month}/${view}` : 'dashboard';
+    const want = `#${intelOpen ? (month ? `${base}/intel` : 'intelligence') : base}`;
     if (window.location.hash !== want) window.history.replaceState(null, '', want);
-  }, [month, view]);
+  }, [month, view, intelOpen]);
 
   const loadMonth = useCallback(async (key) => {
     if (!key) return null;
@@ -323,6 +331,22 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* Phase 2 entry point — docked to the right edge, always reachable from the
+          governance views, and hidden while the intelligence panel is open. */}
+      <button
+        className={`intel-dock no-print${intelOpen ? ' is-hidden' : ''}`}
+        onClick={() => setIntelOpen(true)}
+        title="Open operational intelligence"
+      >
+        <span className="intel-dock-icon"><IconSpark size={16} /></span>
+        <span style={{ textAlign: 'left' }}>
+          <span className="intel-dock-label" style={{ display: 'block' }}>Intelligence</span>
+          <span className="intel-dock-sub">Trends · risk · causes</span>
+        </span>
+      </button>
+
+      <Intelligence open={intelOpen} onClose={() => setIntelOpen(false)} />
 
       {toast && <div className={`toast${toast.bad ? ' is-bad' : ''}`}>{toast.message}</div>}
     </div>

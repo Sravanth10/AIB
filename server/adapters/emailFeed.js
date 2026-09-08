@@ -1,4 +1,4 @@
-import { mean, round } from './util.js';
+import { mean, round, breakdown } from './util.js';
 
 /**
  * Forwarded escalation email thread (PDF) -> metric 15.
@@ -35,8 +35,17 @@ export function adaptEmailFeed(doc) {
   for (const i of items) counts.set(i.category, (counts.get(i.category) || 0) + 1);
   const topCategory = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
+  const breakdowns = breakdown(items, {
+    metricId: 'MAN_ESCALATION_TAT',
+    dimension: 'escalation category',
+    keyFn: (i) => i.category,
+    valueFn: (i) => i.days,
+  });
+
   return {
     metrics,
+    breakdowns,
+    demand: { escalationsRaised: items.length },
     coverage: null, // escalation lines carry day+month only, so no reliable year to anchor to
     stats: {
       records: items.length,

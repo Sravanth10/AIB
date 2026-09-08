@@ -27,3 +27,6 @@ Thumbs.db
 b64*.txt
 log*.txt
 console.json
+
+# generated narrative cache
+data/narratives/

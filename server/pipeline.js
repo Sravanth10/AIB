@@ -71,7 +71,7 @@ export async function ingest(monthKey, incoming) {
 }
 
 /** Re-read every file uploaded for the month and rebuild the pack from scratch. */
-export async function generate(monthKey) {
+export async function generate(monthKey, options = {}) {
   const index = readUploadIndex(monthKey);
   const sources = [];
 
@@ -94,6 +94,8 @@ export async function generate(monthKey) {
       uploadedAt: entry.uploadedAt,
       bytes: entry.bytes,
       metrics: result.metrics ?? {},
+      breakdowns: result.breakdowns ?? [],
+      demand: result.demand ?? null,
       coverage: result.coverage ?? null,
       stats: result.stats ?? {},
       error: result.error ?? null,
@@ -131,13 +133,24 @@ export async function generate(monthKey) {
     });
   }
 
+  // Record-level detail, kept on the analysis so the intelligence layer can cluster
+  // recurring causes across months without re-reading every source file.
+  const breakdowns = sources.flatMap((s) => s.breakdowns ?? []);
+  const demand = Object.assign({}, ...sources.map((s) => s.demand ?? {}));
+
   return writeAnalysis(monthKey, {
     reporting_month: monthKey,
     label: monthLabel(monthKey),
     generated_at: new Date().toISOString(),
-    source_files: sources.map(({ metrics, ...rest }) => ({ ...rest, metricCount: Object.keys(metrics).length })),
+    provenance: options.provenance ?? 'generated',
+    source_files: sources.map(({ metrics, breakdowns: _b, demand: _d, ...rest }) => ({
+      ...rest,
+      metricCount: Object.keys(metrics).length,
+    })),
     sla_results: results,
     summary: summarise(results),
+    breakdowns,
+    demand,
     data_quality_flags: flags,
     quality_summary: qualitySummary(flags),
   });

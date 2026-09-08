@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { SCENARIO, QUEUES } from '../scenario.js';
+import { SCENARIO, QUEUES, CALL_VOLUME } from '../scenario.js';
 import { rng, fitMean, fitWeightedMean, randFloat, randInt, round, sum } from '../lib/num.js';
 import { businessDays, fmtISO, monthLabel, dayOfMonth, daysInMonth } from '../lib/dates.js';
 
@@ -17,13 +17,17 @@ export function generateAwsConnect(monthKey, outPath) {
   const r = rng(sc.seed + 22);
   const days = businessDays(monthKey);
 
+  // Seasonal load. Summer and the August renewal cycle drive real volume swings, which is
+  // what makes contact centre demand forecastable rather than flat.
+  const season = CALL_VOLUME[monthKey] ?? 1;
+
   const rows = [];
   for (const day of days) {
     // Mondays and month-end run hot; mid-week is calmer.
     const dow = day.getUTCDay();
     const load = dow === 1 ? 1.28 : dow === 5 ? 0.86 : 1.0;
     for (const q of QUEUES) {
-      const offered = Math.round(1050 * q.share * load * randFloat(r, 0.82, 1.18));
+      const offered = Math.round(1050 * season * q.share * load * randFloat(r, 0.82, 1.18));
       rows.push({ queue: q.name, date: day, offered });
     }
   }

@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
-import { SCENARIO, BRANCHES } from '../scenario.js';
-import { rng, fitMean, randInt, randFloat, pick, round } from '../lib/num.js';
+import { SCENARIO, BRANCHES, BRANCH_SKEW } from '../scenario.js';
+import { rng, fitMean, randInt, randFloat, pick, round, sum } from '../lib/num.js';
 import { daysInMonth, dayOfMonth, addDays, monthFileTag, monthLabel, isWeekend } from '../lib/dates.js';
 
 /**
@@ -36,8 +36,23 @@ export async function generateBancs(monthKey, outPath) {
     const n = sc.volumes.bancs[processType];
     const target = sc.values[metricId];
 
+    // Assign branches first, because some processes carry a persistent branch weakness that
+    // must show up in the record-level detail without moving the monthly mean.
+    const branches = Array.from({ length: n }, () => pick(r, BRANCHES));
+    const skew = BRANCH_SKEW[processType];
+
     // Organic-looking spread, then shifted so the mean lands exactly on the scenario value.
-    const raw = Array.from({ length: n }, () => randFloat(r, target * 0.45, target * 1.75));
+    let raw = Array.from({ length: n }, () => randFloat(r, target * 0.45, target * 1.75));
+
+    if (skew) {
+      // Apply the branch multipliers, then renormalise so the overall mean is untouched.
+      // The month's headline figure is identical; only its distribution across branches
+      // changes, which is exactly the signal root-cause clustering is meant to find.
+      const weighted = raw.map((v, i) => v * (skew[branches[i]] ?? 1));
+      const factor = sum(raw) / sum(weighted);
+      raw = weighted.map((v) => v * factor);
+    }
+
     const tats = fitMean(raw, target, 1, 0.3);
 
     for (let i = 0; i < n; i++) {
@@ -52,7 +67,7 @@ export async function generateBancs(monthKey, outPath) {
         received,
         completed,
         tat: tats[i],
-        branch: pick(r, BRANCHES),
+        branch: branches[i],
         status: 'Completed - STP',
       });
     }

@@ -1,4 +1,4 @@
-import { mean, round, coverageOf, toDate } from './util.js';
+import { mean, round, coverageOf, toDate, breakdown } from './util.js';
 
 /**
  * Azure operational report (PDF) -> metrics 11, 12, 13.
@@ -41,8 +41,20 @@ export function adaptAzure(doc) {
 
   const breaches = records.filter((r) => r.status === 'Breach');
 
+  // Per-service and per-region detail: which platform component is the recurring offender.
+  const breakdowns = [];
+  for (const def of METRIC_MAP) {
+    const forMetric = records.filter((r) => def.match.test(r.metricLabel));
+    if (!forMetric.length) continue;
+    breakdowns.push(
+      ...breakdown(forMetric, { metricId: def.metric, dimension: 'service', keyFn: (r) => r.service, valueFn: (r) => r.value, minRecords: 2 }),
+      ...breakdown(forMetric, { metricId: def.metric, dimension: 'region', keyFn: (r) => r.region, valueFn: (r) => r.value, minRecords: 2 }),
+    );
+  }
+
   return {
     metrics,
+    breakdowns,
     coverage: coverageOf(records.map((r) => toDate(r.date))),
     stats: {
       records: records.length,

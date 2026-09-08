@@ -554,6 +554,179 @@ p { margin: 0; }
 }
 .back-link:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
 
+/* =========================================================================
+   PHASE 2 — Operational intelligence
+   Same tokens, same components, same palette. This must read as one product
+   with two views, not a second tool bolted on.
+   ======================================================================== */
+
+/* --------------------------------------------------- docked entry control */
+
+.intel-dock {
+  position: fixed; right: 0; bottom: 34px; z-index: 40;
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 18px 13px 15px; border-radius: 16px 0 0 16px;
+  background: linear-gradient(135deg, var(--violet) 0%, var(--violet-600) 55%, var(--violet-800) 100%);
+  color: #fff; box-shadow: -6px 8px 28px rgba(70, 45, 180, 0.32);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, opacity 0.2s ease;
+}
+.intel-dock:hover { transform: translateX(-4px); box-shadow: -10px 12px 34px rgba(70, 45, 180, 0.42); }
+.intel-dock.is-hidden { opacity: 0; pointer-events: none; transform: translateX(40px); }
+.intel-dock-label { font-size: 12.5px; font-weight: 620; letter-spacing: -0.01em; }
+.intel-dock-sub { font-size: 10px; color: rgba(255, 255, 255, 0.66); margin-top: 2px; }
+.intel-dock-icon {
+  width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
+  background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.24); flex: 0 0 32px;
+}
+
+/* ------------------------------------------------------- sliding overlay */
+
+.intel-panel {
+  position: fixed; inset: 0; z-index: 50; background: var(--magnolia);
+  display: flex; flex-direction: column; overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.intel-panel.is-open { transform: translateX(0); }
+
+.intel-scrim {
+  position: fixed; inset: 0; z-index: 45; background: rgba(36, 29, 71, 0.28);
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.intel-scrim.is-open { opacity: 1; }
+
+/* The dock icon's destination: top centre, with the one-line explainer. */
+.intel-header {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding: 26px 34px 20px; position: relative; text-align: center;
+}
+.intel-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 11px 20px; border-radius: 999px; color: #fff;
+  background: linear-gradient(135deg, var(--violet) 0%, var(--violet-600) 55%, var(--violet-800) 100%);
+  box-shadow: 0 8px 26px rgba(70, 45, 180, 0.3);
+  animation: badgeSettle 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.12s;
+}
+@keyframes badgeSettle {
+  from { transform: translateY(46vh) translateX(28vw) scale(0.82); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.intel-badge-title { font-size: 13.5px; font-weight: 650; letter-spacing: -0.01em; }
+.intel-brief {
+  font-size: 12.5px; color: var(--ink-3); max-width: 620px; line-height: 1.6;
+  animation: rowIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.34s;
+}
+.intel-back {
+  position: absolute; left: 30px; top: 26px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 15px 9px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 580;
+  background: #fff; border: 1px solid var(--line); color: var(--violet-700);
+  box-shadow: var(--shadow-sm); transition: transform 0.16s ease, border-color 0.16s ease;
+}
+.intel-back:hover { transform: translateX(-3px); border-color: var(--periwinkle); }
+
+.intel-body { padding: 6px 34px 44px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ------------------------------------------------------------ scope bar */
+
+.scope-bar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: #fff; border: 1px solid var(--line); border-radius: 999px;
+  padding: 7px 9px; box-shadow: var(--shadow-sm); align-self: center;
+}
+.scope-chip {
+  padding: 7px 15px; border-radius: 999px; font-size: 12.5px; font-weight: 580;
+  color: var(--ink-2); transition: background 0.14s ease, color 0.14s ease;
+}
+.scope-chip:hover { background: var(--violet-050); }
+.scope-chip.is-active {
+  background: linear-gradient(135deg, var(--violet) 0%, var(--violet-600) 100%);
+  color: #fff; box-shadow: 0 3px 12px rgba(110, 91, 224, 0.3);
+}
+
+/* --------------------------------------------------------------- panels */
+
+.intel-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 1180px) { .intel-grid { grid-template-columns: 1fr; } }
+
+.narrative-card {
+  border-radius: var(--radius); padding: 26px 28px; color: #fff;
+  background: linear-gradient(128deg, var(--violet-600) 0%, var(--violet-700) 48%, var(--violet-800) 100%);
+  box-shadow: 0 16px 44px rgba(70, 45, 180, 0.26);
+}
+.narrative-card h2 { font-size: 15px; }
+.narrative-meta { font-size: 10.5px; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 620; }
+.narrative-text { margin-top: 15px; font-size: 13.5px; line-height: 1.78; color: rgba(255, 255, 255, 0.93); }
+.narrative-text p + p { margin-top: 13px; }
+.narrative-source {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 17px;
+  font-size: 10.5px; font-weight: 600; padding: 4px 11px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ---------------------------------------------------------- trend chart */
+
+.trend-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.metric-select {
+  appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink);
+  font-size: 12.5px; font-weight: 580; padding: 8px 30px 8px 13px; border-radius: 999px; cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 4l3 3 3-3' fill='none' stroke='%237b74a3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat; background-position: right 12px center; max-width: 320px;
+}
+.chart-wrap { padding: 20px 24px 16px; }
+.chart-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; color: var(--ink-3); margin-top: 10px; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend i { width: 12px; height: 3px; border-radius: 2px; display: block; }
+.chart-legend i.band { height: 10px; width: 12px; border-radius: 3px; }
+
+/* ------------------------------------------------------------ risk list */
+
+.risk-row {
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center;
+  padding: 13px 16px; border-radius: 15px; border: 1px solid var(--line); background: #fff;
+}
+.risk-row + .risk-row { margin-top: 8px; }
+.risk-row.is-credit { border-color: var(--apricot); background: linear-gradient(96deg, var(--papaya) 0%, #fff 54%); }
+.risk-score {
+  width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
+  font-size: 15px; font-weight: 720; font-variant-numeric: tabular-nums;
+}
+.risk-name { font-size: 13.5px; font-weight: 600; }
+.risk-why { font-size: 11.5px; color: var(--ink-3); margin-top: 4px; line-height: 1.5; }
+.risk-figures { text-align: right; white-space: nowrap; }
+.risk-projection { font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.risk-arrow { color: var(--ink-4); margin: 0 5px; }
+
+/* --------------------------------------------------------- cluster list */
+
+.cluster-row {
+  display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center;
+  padding: 13px 16px; border-radius: 15px; border: 1px solid var(--line); background: #fff;
+}
+.cluster-row + .cluster-row { margin-top: 8px; }
+.cluster-driver { font-size: 13.5px; font-weight: 640; }
+.cluster-meta { font-size: 11.5px; color: var(--ink-3); margin-top: 4px; }
+.cluster-delta { font-size: 17px; font-weight: 700; color: var(--red); font-variant-numeric: tabular-nums; }
+.cluster-persist { font-size: 10.5px; color: var(--ink-4); margin-top: 2px; }
+
+.months-strip { display: flex; gap: 3px; margin-top: 7px; }
+.months-strip i {
+  width: 15px; height: 5px; border-radius: 2px; display: block; background: var(--line);
+}
+.months-strip i.hit { background: var(--red); }
+
+/* -------------------------------------------------------------- demand */
+
+.demand-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.demand-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; box-shadow: var(--shadow-sm); }
+.demand-label { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); font-weight: 650; }
+.demand-value { font-size: 24px; font-weight: 700; letter-spacing: -0.035em; margin-top: 7px; font-variant-numeric: tabular-nums; }
+.demand-change { font-size: 12px; font-weight: 620; margin-top: 5px; }
+.demand-change.up { color: var(--red); }
+.demand-change.down { color: var(--green); }
+.demand-note { font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+
 /* ------------------------------------------------------------------- print */
 
 @media print {

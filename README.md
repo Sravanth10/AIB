@@ -130,6 +130,86 @@ Planted defects the data-quality engine finds: no FCR column, August's Azure exp
 days before period end, a duplicated complaint reference, open cases with blank close dates,
 and hand-typed dates mixed with real date cells in one column.
 
+---
+
+# Phase 2 — Operational Intelligence
+
+Phase 1 reports what happened. Phase 2 reads the history Phase 1 produces and says what is
+coming. It does not replace the pipeline — it analyses its output.
+
+Open it from the **Intelligence** control docked to the right edge of any governance screen.
+The panel slides in over the top; the arrow at top-left slides it back out. Deep-linkable at
+`#<month>/<view>/intel`.
+
+## The four capabilities
+
+**Multi-month trend** — any of the 15 SLAs across the full history, with the target line,
+the amber tolerance band and the breach region drawn as shaded areas. The line entering the
+band *is* the finding; you do not have to read a number to see it.
+
+**Breach risk** — a ranked forecast for the month after the history ends. Two explainable
+ingredients: the recent trend slope projected forward, and how far that projection sits from
+the point where the metric formally breaches, measured in that metric's own tolerance units.
+A metric comfortably inside target but falling fast can outrank one already amber but stable.
+Every row shows its reasoning verbatim.
+
+**Recurring failure points** — a driver (branch, queue, service, category) is compared against
+its metric's own average for the same month. Consistently worse across several months means a
+systemic weak spot rather than a bad month, and that distinction is the whole point. Cork and
+Galway surface on underwriting TAT in every period.
+
+**Executive insight** — a narrative that synthesises the three above into something a
+governance lead reads in ten seconds.
+
+## Bedrock, and what happens without it
+
+The narrative has two layers, the same shape as the Phase 1 classifier:
+
+| Layer | When | Notes |
+|---|---|---|
+| **Bedrock** | `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` set | Claude via `AnthropicBedrockMantle`, model from `BEDROCK_MODEL_ID` |
+| **Rules** | otherwise, or on any API failure | Deterministic prose composed from the same computed figures |
+
+Copy `.env.example` to `.env` and fill in the credentials. **The model is given the
+arithmetic and asked to phrase it — it is never asked to work out what the numbers are.**
+Every figure it can quote has already been calculated by the engine, and the system prompt
+forbids stating anything not in its input.
+
+Narratives are **cached on disk** keyed by a hash of the inputs, so a demo never depends on a
+live call and a free-tier key cannot be throttled mid-presentation. Nothing on the page
+breaks if Bedrock is unreachable — it silently falls back and labels which layer produced the
+text.
+
+## The six-month history
+
+`npm run demo` builds April–August 2026; September is the live run. April, May and June are
+Phase 2 backfill, tagged `provenance: "synthetic-backfill"` in the stored analysis (the UI
+does not distinguish them). They are built through the *same* ingestion pipeline as every
+other month, not written as fake JSON.
+
+Four patterns run through the history so the intelligence layer has something real to find:
+
+| Pattern | Where |
+|---|---|
+| Steady decline | complaint and escalation resolution climb every month → the breach prediction |
+| Stable | endorsement TAT, STP accuracy, uptime → proof it is not crying wolf |
+| Seasonal | contact centre load spikes in June and August → demand forecasting |
+| Recurring cause | underwriting delay concentrated in Cork and Galway every month → clustering |
+
+The branch skew is applied so the **monthly headline figure is unchanged** — only its
+distribution across branches shifts. August underwriting TAT is exactly 3.20d either way;
+Cork sits at 4.18d and Dublin at 2.50d underneath it.
+
+## Phase 2 demo beat
+
+Open **August 2026** → governance pack → click **Intelligence** bottom-right. It slides in,
+the badge settles top-centre with its one-line brief, and the panel lands on All History:
+escalation resolution has climbed every month and is projected past target again; Cork and
+Galway are named as the recurring driver in 5 of 5 periods; the executive summary ties it
+together. Narrow to a single month with the scope bar, then arrow back to governance.
+
+---
+
 ## Not built yet
 
 - **LLM cross-check on classification.** The structural classifier is the safe layer and

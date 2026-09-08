@@ -33,4 +33,5 @@ export const api = {
 
   remove: (month, uploadId) => req(`/api/uploads/${month}/${uploadId}`, { method: 'DELETE' }),
   generate: (month) => req(`/api/generate/${month}`, { method: 'POST' }),
+  intelligence: (scope = 'all') => req(`/api/intelligence?scope=${encodeURIComponent(scope)}`),
 };

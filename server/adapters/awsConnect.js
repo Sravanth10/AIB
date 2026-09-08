@@ -1,4 +1,4 @@
-import { locateGrid, col, toNum, toDate, mean, sum, round, coverageOf } from './util.js';
+import { locateGrid, col, toNum, toDate, mean, sum, round, coverageOf, breakdown } from './util.js';
 
 /**
  * AWS Connect queue export -> metrics 6, 7, 9, 10.
@@ -60,8 +60,24 @@ export function adaptAwsConnect(doc) {
   const qaVals = rows.map((r) => r.qa).filter((v) => v != null);
   if (qaVals.length) metrics.AWS_QA = { value: round(mean(qaVals), 2), sampleSize: qaVals.length };
 
+  // Per-queue detail: which queue is dragging each contact centre metric.
+  const byQueue = (metricId, valueFn) =>
+    breakdown(rows, { metricId, dimension: 'queue', keyFn: (x) => x.queue, valueFn });
+
+  const breakdowns = [
+    ...byQueue('AWS_ASA', (x) => x.asa),
+    ...byQueue('AWS_AHT', (x) => x.aht),
+    ...byQueue('AWS_QA', (x) => x.qa),
+    ...byQueue('AWS_ABANDON', (x) => (x.offered > 0 ? ((x.offered - x.answered) / x.offered) * 100 : null)),
+  ];
+
   return {
     metrics,
+    breakdowns,
+    // Call volume is the demand signal the forecasting story rests on.
+    demand: { callsOffered: totalOffered, byQueue: Object.fromEntries(
+      [...new Set(rows.map((r) => r.queue))].map((q) => [q, sum(rows.filter((r) => r.queue === q).map((r) => r.offered))]),
+    ) },
     coverage: coverageOf(dates),
     stats: {
       records: rows.length,
