@@ -149,6 +149,26 @@ if (fs.existsSync(DIST)) {
   app.get(/^(?!\/api\/).*/, (req, res) => res.sendFile(path.join(DIST, 'index.html')));
 }
 
-app.listen(PORT, () => {
+/**
+ * On a host with an ephemeral filesystem the uploads and packs vanish on every restart,
+ * leaving a dashboard with nothing on it. Rebuilding the demo history when none is found
+ * makes a cold start self-healing. Local runs are untouched, because local state persists.
+ *
+ * Set SKIP_BOOTSTRAP_DEMO=1 to deploy an genuinely empty instance.
+ */
+async function ensureDemoHistory() {
+  if (process.env.SKIP_BOOTSTRAP_DEMO === '1') return;
+  if (listMonths().length) return;
+  try {
+    const { prepareDemo } = await import('./prepareDemo.js');
+    const built = await prepareDemo();
+    if (built.length) console.log(`cold start — rebuilt demo history: ${built.join(', ')}`);
+  } catch (err) {
+    console.warn(`could not rebuild demo history: ${err.message}`);
+  }
+}
+
+app.listen(PORT, async () => {
   console.log(`AIB Life prototype API  ->  http://localhost:${PORT}`);
+  await ensureDemoHistory();
 });

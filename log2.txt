@@ -1,0 +1,20 @@
+Starting deployment setup...
+16+0 records in
+16+0 records out
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 15.8662 s, 135 MB/s
+Setting up swapspace version 1, size = 2 GiB (2147479552 bytes)
+no label, UUID=572cb0fb-5eac-4e9c-abb8-20724f01627f
+Amazon Linux 2023 repository                     72 MB/s |  78 MB     00:01    
+Amazon Linux 2023 Kernel Livepatch repository   535 kB/s |  69 kB     00:00    
+Dependencies resolved.
+Nothing to do.
+Complete!
+[38;5;79m2026-09-03 06:19:58 - Cleaning up old repositories...[0m
+[38;5;79m2026-09-03 06:19:58 - Old repositories removed[0m
+[38;5;79m2026-09-03 06:19:58 - Supported architecture: x86_64[0m
+[38;5;79m2026-09-03 06:19:58 - Added N|Solid repository for LTS version: 20.x[0m
+[38;5;79m2026-09-03 06:19:58 - dnf available, updating...[0m
+Node.js Packages for Linux RPM based distros -  8.6 MB/s | 1.1 MB     00:00    
+Last metadata expiration check: 0:00:01 ago on Thu Sep  3 06:19:58 2026.
+Metadata cache created.
+N|Solid Packages for Linux RPM based distros -   16 MB/s | 1.0 MB     00:00    

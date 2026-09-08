@@ -1,0 +1,30 @@
+Metadata cache created.
+[38;5;79m2026-09-03 06:20:00 - Repository is configured and updated.[0m
+[38;5;79m2026-09-03 06:20:00 - You can use N|solid Runtime as a node.js alternative[0m
+[1;32m2026-09-03 06:20:00 - To install N|solid Runtime, run: dnf install nsolid -y[0m
+[38;5;79m2026-09-03 06:20:00 - Run 'dnf install nodejs -y' to complete the installation.[0m
+Last metadata expiration check: 0:00:01 ago on Thu Sep  3 06:19:59 2026.
+Dependencies resolved.
+================================================================================
+ Package           Arch    Version                     Repository          Size
+================================================================================
+Installing:
+ git               x86_64  2.50.1-1.amzn2023.0.1       amazonlinux         53 k
+ nodejs            x86_64  2:20.20.2-1nodesource       nodesource-nodejs   37 M
+Installing dependencies:
+ git-core          x86_64  2.50.1-1.amzn2023.0.1       amazonlinux        4.9 M
+ git-core-doc      noarch  2.50.1-1.amzn2023.0.1       amazonlinux        2.8 M
+ perl-Error        noarch  1:0.17030-2.amzn2023.0.1    amazonlinux         42 k
+ perl-File-Find    noarch  1.37-477.amzn2023.0.9       amazonlinux         26 k
+ perl-Git          noarch  2.50.1-1.amzn2023.0.1       amazonlinux         41 k
+ perl-TermReadKey  x86_64  2.38-9.amzn2023.0.3         amazonlinux         36 k
+ perl-lib          x86_64  0.65-477.amzn2023.0.9       amazonlinux         15 k
+
+Transaction Summary
+================================================================================
+Install  9 Packages
+
+Total download size: 45 M
+Installed size: 147 M
+Downloading Packages:
+(1/9): git-2.50.1-1.amzn2023.0.1.x86_64.rpm     1.5 MB/s |  53 kB     00:00    

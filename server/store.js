@@ -3,11 +3,23 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const DATA_DIR = path.join(ROOT, 'data');
+
+/**
+ * Writable state lives under DATA_DIR. It defaults to ./data for local work, but hosts that
+ * give you a persistent disk mount it somewhere else entirely — set DATA_DIR to that path
+ * and uploads plus generated packs survive restarts and redeploys.
+ *
+ * The read-only fixtures (seed, holdback) always come from the repo, never from DATA_DIR.
+ */
+export const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.join(ROOT, 'data');
 export const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 export const ANALYSES_DIR = path.join(DATA_DIR, 'analyses');
-export const SEED_DIR = path.join(DATA_DIR, 'seed');
-export const HOLDBACK_DIR = path.join(DATA_DIR, 'holdback');
+// Fixtures are shipped in the repo, so they resolve against ROOT even when state has been
+// pointed at a mounted disk.
+export const SEED_DIR = path.join(ROOT, 'data', 'seed');
+export const HOLDBACK_DIR = path.join(ROOT, 'data', 'holdback');
 
 const MONTH_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
