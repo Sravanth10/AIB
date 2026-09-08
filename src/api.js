@@ -34,4 +34,11 @@ export const api = {
   remove: (month, uploadId) => req(`/api/uploads/${month}/${uploadId}`, { method: 'DELETE' }),
   generate: (month) => req(`/api/generate/${month}`, { method: 'POST' }),
   intelligence: (scope = 'all') => req(`/api/intelligence?scope=${encodeURIComponent(scope)}`),
+
+  ask: (scope, question) =>
+    req('/api/intelligence/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scope, question }),
+    }),
 };

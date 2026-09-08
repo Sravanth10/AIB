@@ -10,6 +10,7 @@ import { SLA_METRICS } from './slaEngine.js';
 import { ingest, generate } from './pipeline.js';
 import { buildIntelligence } from './intelligence.js';
 import { generateNarrative, narrativeStatus } from './narrative.js';
+import { askAssistant, suggestedQuestions } from './assistant.js';
 import {
   ROOT, listMonths, monthLabel, isMonthKey, createSpace, currentMonthKey,
   readUploadIndex, writeUploadIndex, readAnalysis, deleteUploadFile, listSampleFiles,
@@ -160,7 +161,32 @@ app.get('/api/intelligence', async (req, res) => {
     if (intel.empty) return res.json({ ...intel, narrative: null, narrativeStatus: narrativeStatus() });
 
     const narrative = await generateNarrative(intel, { refresh: req.query.refresh === '1' });
-    res.json({ ...intel, narrative, narrativeStatus: narrativeStatus() });
+    res.json({
+      ...intel,
+      narrative,
+      narrativeStatus: narrativeStatus(),
+      suggestedQuestions: suggestedQuestions(intel),
+    });
+  } catch (err) {
+    fail(res, 500, err.message);
+  }
+});
+
+/**
+ * Grounded Q&A over one report's computed outputs. Deliberately stateless and single-turn —
+ * this is a lookup layer over the intelligence payload, not a conversational agent.
+ */
+app.post('/api/intelligence/ask', async (req, res) => {
+  const { question, scope: rawScope } = req.body ?? {};
+  const scope = rawScope && rawScope !== 'all' ? String(rawScope) : 'all';
+  if (scope !== 'all' && !isMonthKey(scope)) return fail(res, 400, 'Invalid scope');
+  if (!String(question ?? '').trim()) return fail(res, 400, 'Ask a question about the report');
+  if (String(question).length > 400) return fail(res, 400, 'Question is too long');
+
+  try {
+    const intel = buildIntelligence({ scope });
+    if (intel.empty) return fail(res, 400, 'No history to answer from yet');
+    res.json(await askAssistant(intel, question));
   } catch (err) {
     fail(res, 500, err.message);
   }

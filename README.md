@@ -159,7 +159,43 @@ systemic weak spot rather than a bad month, and that distinction is the whole po
 Galway surface on underwriting TAT in every period.
 
 **Executive insight** — a narrative that synthesises the three above into something a
-governance lead reads in ten seconds.
+governance lead reads in ten seconds, with an **Ask about this report** box underneath.
+
+## Ask about this report
+
+A Q&A layer over the computed outputs — not a chatbot. Single question, single answer, no
+conversation history, no tools, no retrieval, no knowledge of anything outside the report.
+Ask it about the weather and it says it only covers this report.
+
+Question chips are generated from what this particular report contains, so they always name
+real findings. Typing works too:
+
+> **why is Claims TAT flagged?**
+> Claims processing time is flagged because it has declined in 67% of recent months, is
+> already in breach at 11.1 days, and carries a service-credit consequence. The main drivers
+> are the Waterford and Cork branches, and the Maturity Claim process sub type.
+
+Every figure there was computed before the model saw the question.
+
+**Metric resolution is weighted, not literal.** Plain token matching fails on "Claims TAT" —
+"claims" scores one hit while "TAT" appears in five other metric names. Terms are weighted by
+how many metrics they appear across, so a term unique to one metric ("claims", "uptime") is
+decisive on its own and a shared one ("tat", "time") barely counts. Aliases cover how people
+actually speak in a governance meeting. When nothing resolves confidently it answers
+generally rather than confidently about the wrong metric.
+
+## The fabrication guard
+
+Both the narrative and the assistant run the same check: **every digit-bearing token in the
+output must appear somewhere in the input it was given.** Anything else means a figure was
+invented, and the deterministic version is used instead.
+
+This is not theoretical. During the build the model reported the call-volume forecast as
+landing in the busiest *past* month, and separately called a four-way service-credit exposure
+"the only metric" carrying one. Both were caught, and both were fixed by making the input
+field names impossible to misread rather than by hoping the prompt held.
+
+In a governance pack an invented number is worse than no summary.
 
 ## Bedrock, and what happens without it
 

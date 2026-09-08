@@ -243,7 +243,37 @@ Rules:
   no "journey", no "delve".
 - A senior governance lead should grasp the position in ten seconds.`;
 
-const awsRegion = () => process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1';
+export const awsRegion = () => process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1';
+
+/** Shared Bedrock text call, used by the narrative and the Q&A assistant alike. */
+export async function bedrockText({ system, user, maxTokens = 1400, temperature = 0.2 }) {
+  if (isNova(BEDROCK_MODEL)) {
+    const { BedrockRuntimeClient, ConverseCommand } = await import('@aws-sdk/client-bedrock-runtime');
+    const client = new BedrockRuntimeClient({ region: awsRegion() });
+    const res = await client.send(
+      new ConverseCommand({
+        modelId: BEDROCK_MODEL,
+        system: [{ text: system }],
+        messages: [{ role: 'user', content: [{ text: user }] }],
+        inferenceConfig: { maxTokens, temperature, topP: 0.9 },
+      }),
+    );
+    return (res.output?.message?.content ?? []).map((b) => b.text ?? '').join('').trim();
+  }
+
+  const { AnthropicBedrockMantle } = await import('@anthropic-ai/bedrock-sdk');
+  const client = new AnthropicBedrockMantle({ awsRegion: awsRegion() });
+  const res = await client.messages.create({
+    model: BEDROCK_MODEL,
+    max_tokens: maxTokens,
+    system,
+    messages: [{ role: 'user', content: user }],
+  });
+  return res.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
+}
+
+export const activeModel = () => BEDROCK_MODEL;
+export const bedrockAvailable = () => hasBedrockCredentials();
 
 const userPrompt = (intel) =>
   `Write the executive insight summary from these computed figures:\n\n${JSON.stringify(brief(intel), null, 2)}`;
@@ -299,7 +329,7 @@ async function claudeNarrative(intel) {
  * Word-form numbers ("three consecutive months") are left alone: they restate the input in
  * prose rather than asserting a new quantity.
  */
-function unsupportedFigures(text, payload) {
+export function unsupportedFigures(text, payload) {
   const known = new Set();
   for (const m of JSON.stringify(payload).matchAll(/-?\d+(?:\.\d+)?/g)) {
     known.add(m[0]);

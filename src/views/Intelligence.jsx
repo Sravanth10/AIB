@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
 import TrendChart from '../components/TrendChart.jsx';
+import AskReport from '../components/AskReport.jsx';
 import { Rag, CreditTag } from '../components/Chips.jsx';
 import { IconSpark, IconAlert, IconLayers, IconCircleCheck, IconClock } from '../components/Icons.jsx';
 import { fmtValue, fmtTarget } from '../lib/format.js';
@@ -137,6 +138,8 @@ export default function Intelligence({ open, onClose }) {
                       : 'Composed from the computed trend, risk and cluster outputs'}
                     {data.narrative.cached ? ' · cached' : ''}
                   </span>
+
+                  <AskReport key={scope} scope={scope} suggestions={data.suggestedQuestions ?? []} />
                 </div>
               )}
 
