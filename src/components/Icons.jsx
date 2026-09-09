@@ -93,6 +93,25 @@ export const IconWand = ({ size = 15 }) => (
   </svg>
 );
 
+export const IconSearch = ({ size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <circle cx="10.8" cy="10.8" r="6.6" />
+    <path d="m15.6 15.6 4.2 4.2" />
+  </svg>
+);
+
+export const IconBolt = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <path d="M13.2 2.6 4.8 13.4h6L10.2 21.4 19.2 10.6h-6.4l.4-8Z" />
+  </svg>
+);
+
+export const IconChevron = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base} strokeWidth={2}>
+    <path d="m9 5 7 7-7 7" />
+  </svg>
+);
+
 export const IconShield = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
     <path d="M12 2.8 4.5 6v6c0 4.4 3.1 8.2 7.5 9.2 4.4-1 7.5-4.8 7.5-9.2V6L12 2.8Z" />

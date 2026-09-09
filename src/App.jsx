@@ -6,9 +6,9 @@ import Consolidated from './views/Consolidated.jsx';
 import Exceptions from './views/Exceptions.jsx';
 import Pack from './views/Pack.jsx';
 import Intelligence from './views/Intelligence.jsx';
-import Logo from './components/Logo.jsx';
-import { IconCloud, IconGrid, IconAlert, IconDoc, IconClock, IconLayers, IconSpark } from './components/Icons.jsx';
-import { fmtStamp, relativeTime } from './lib/format.js';
+import Rail from './components/Rail.jsx';
+import { IconCloud, IconGrid, IconAlert, IconDoc, IconClock, IconSpark } from './components/Icons.jsx';
+import { fmtStamp } from './lib/format.js';
 
 const VIEWS = [
   { id: 'ingest', label: 'Ingest & classify', icon: IconCloud, needsPack: false },
@@ -181,88 +181,19 @@ export default function App() {
   return (
     <div className="app">
       {/* -------------------------------------------------------------- rail */}
-      <aside className="rail">
-        <div className="brand">
-          <Logo height={28} />
-          <div className="brand-sub">SLA Governance</div>
-        </div>
-
-        <nav className="nav">
-          <button className={`nav-item${onDashboard ? ' is-active' : ''}`} onClick={() => setMonth(null)}>
-            <IconLayers size={16} /> Dashboard
-            {boot.months.length > 0 && <span className="nav-count">{boot.months.length}</span>}
-          </button>
-        </nav>
-
-        {boot.months.length > 0 && (
-          <div>
-            <div className="rail-label">Reporting periods</div>
-            <div className="month-list">
-              {boot.months.map((m) => {
-                const s = m.summary;
-                return (
-                  <button
-                    key={m.month}
-                    className={`month-card${m.month === month ? ' is-active' : ''}`}
-                    onClick={() => openMonth(m.month)}
-                  >
-                    <div className="month-card-top">
-                      <span className="month-card-name">{m.label}</span>
-                      {s && (
-                        <span className="month-dots">
-                          {s.RED > 0 && <i className="dot r" />}
-                          {s.AMBER > 0 && <i className="dot a" />}
-                          {s.GREEN > 0 && <i className="dot g" />}
-                          {s.NO_DATA > 0 && <i className="dot n" />}
-                        </span>
-                      )}
-                    </div>
-                    <div className="month-card-meta">
-                      {m.generatedAt
-                        ? `${s.breaches} breach${s.breaches === 1 ? '' : 'es'} · ${relativeTime(m.generatedAt)}`
-                        : m.uploadCount
-                          ? `${m.uploadCount} file${m.uploadCount === 1 ? '' : 's'} staged · no pack yet`
-                          : 'open · no files yet'}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {!onDashboard && (
-          <div>
-            <div className="rail-label">{activeMonth?.label ?? month}</div>
-            <nav className="nav">
-              {VIEWS.map((v) => {
-                const Icon = v.icon;
-                const disabled = v.needsPack && !hasPack;
-                return (
-                  <button
-                    key={v.id}
-                    className={`nav-item${view === v.id ? ' is-active' : ''}`}
-                    disabled={disabled}
-                    onClick={() => !disabled && setView(v.id)}
-                  >
-                    <Icon size={16} />
-                    {viewLabel(v, hasPack)}
-                    {v.id === 'ingest' && uploads.length > 0 && <span className="nav-count">{uploads.length}</span>}
-                    {v.id === 'exceptions' && analysis?.summary?.breaches > 0 && (
-                      <span className="nav-count">{analysis.summary.breaches}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        )}
-
-        <div className="rail-foot">
-          Phase 1 prototype · synthetic data<br />
-          Source type identified from document structure, never from filename.
-        </div>
-      </aside>
+      <Rail
+        boot={boot}
+        month={month}
+        view={view}
+        views={VIEWS}
+        uploads={uploads}
+        analysis={analysis}
+        hasPack={hasPack}
+        viewLabel={viewLabel}
+        onOpenMonth={openMonth}
+        onDashboard={() => setMonth(null)}
+        onSelectView={setView}
+      />
 
       {/* -------------------------------------------------------------- main */}
       <main className="main">
