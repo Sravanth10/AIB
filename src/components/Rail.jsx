@@ -162,8 +162,8 @@ export default function Rail({
         )}
 
         <div className="rail-foot">
-          Phase 1 · 2 prototype · synthetic data<br />
-          Source type identified from document structure, never from filename.
+          Phase 1 · 2 prototype · synthetic data
+          <span className="rail-foot-more"><br />Source type identified from document structure, never from filename.</span>
         </div>
       </aside>
 
