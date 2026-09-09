@@ -22,6 +22,12 @@ export default function Intelligence({ open, onClose }) {
   const [loading, setLoading] = useState(false);
   const [metricId, setMetricId] = useState(null);
   const [error, setError] = useState(null);
+  // Increments on each open, so the header animation replays without unmounting on close.
+  const [openCount, setOpenCount] = useState(0);
+
+  useEffect(() => {
+    if (open) setOpenCount((n) => n + 1);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -63,15 +69,14 @@ export default function Intelligence({ open, onClose }) {
             Governance
           </button>
 
-          {open && (
-            <>
-              <div className="intel-badge">
-                <IconSpark size={17} />
-                <span className="intel-badge-title">Operational Intelligence</span>
-              </div>
-              <p className="intel-brief">{BRIEF}</p>
-            </>
-          )}
+          {/* Keyed on the open count rather than gated on `open`: remounting replays the
+              entrance each time the panel is opened, while leaving the header on screen
+              through the slide-out instead of blinking away before the panel has moved. */}
+          <div className="intel-badge" key={`badge-${openCount}`}>
+            <IconSpark size={17} />
+            <span className="intel-badge-title">Operational Intelligence</span>
+          </div>
+          <p className="intel-brief" key={`brief-${openCount}`}>{BRIEF}</p>
         </header>
 
         <div className="intel-body">

@@ -242,18 +242,34 @@ p { margin: 0; }
   backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 22px 60px rgba(16, 4, 60, 0.5);
-  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* The panel itself settles first, then the items fade in behind it. */
+  animation: popIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-@keyframes popIn { from { opacity: 0; transform: translateX(-8px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes popIn { from { opacity: 0; transform: translateX(-10px) scale(0.96); } to { opacity: 1; transform: none; } }
 
 .actions-pop-head {
   font-size: 10.5px; letter-spacing: 0.13em; text-transform: uppercase; font-weight: 650;
   color: rgba(255, 255, 255, 0.5); padding: 8px 12px 10px;
 }
+/* Items arrive one after another rather than all at once — the eye follows the list down
+   instead of being handed a finished block. --i is set per item in Rail.jsx. */
 .actions-item {
   display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
   padding: 10px 12px; border-radius: 12px; color: rgba(255, 255, 255, 0.88);
   transition: background 0.13s ease;
+  opacity: 0;
+  animation: actionItemIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(90ms + var(--i, 0) * 70ms);
+}
+@keyframes actionItemIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Respect a reduced-motion preference: show the menu, skip the choreography. */
+@media (prefers-reduced-motion: reduce) {
+  .actions-item { opacity: 1; animation: none; }
+  .actions-pop, .intel-panel, .intel-scrim, .intel-badge, .intel-brief { animation: none; transition: none; }
 }
 .actions-item:hover:not([disabled]) { background: rgba(255, 255, 255, 0.14); color: #fff; }
 .actions-item.is-active { background: rgba(255, 255, 255, 0.2); color: #fff; }
@@ -733,7 +749,9 @@ p { margin: 0; }
   color: #fff; box-shadow: -6px 8px 28px rgba(70, 45, 180, 0.32);
   /* Slightly translucent so anything it floats over stays perceptible rather than erased. */
   backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, opacity 0.2s ease;
+  /* Fades out in step with the panel sliding in, rather than snapping away ahead of it. */
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease,
+              opacity 0.42s ease, translate 0.42s ease;
 }
 .intel-dock:hover {
   transform: translateX(-4px); box-shadow: -10px 12px 34px rgba(70, 45, 180, 0.42);
@@ -753,13 +771,18 @@ p { margin: 0; }
   position: fixed; inset: 0; z-index: 50; background: var(--magnolia);
   display: flex; flex-direction: column; overflow-y: auto;
   transform: translateX(100%);
-  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Deliberately unhurried — this is a scene change between two views of the product, and
+     the eye needs time to read it as one panel sliding over another.
+     The curve matters as much as the duration: a hard ease-out covers half the screen in
+     the first tenth of a second and then crawls, which reads as lag rather than grace. This
+     one accelerates and decelerates evenly, so the whole movement feels unhurried. */
+  transition: transform 0.8s cubic-bezier(0.42, 0.02, 0.2, 1);
 }
 .intel-panel.is-open { transform: translateX(0); }
 
 .intel-scrim {
   position: fixed; inset: 0; z-index: 45; background: rgba(36, 29, 71, 0.28);
-  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+  opacity: 0; pointer-events: none; transition: opacity 0.7s ease;
 }
 .intel-scrim.is-open { opacity: 1; }
 
@@ -773,8 +796,10 @@ p { margin: 0; }
   padding: 11px 20px; border-radius: 999px; color: #fff;
   background: linear-gradient(135deg, var(--violet) 0%, var(--violet-600) 55%, var(--violet-800) 100%);
   box-shadow: 0 8px 26px rgba(70, 45, 180, 0.3);
-  animation: badgeSettle 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0.12s;
+  /* Rides in with the panel: the icon travels from its docked corner up to the header,
+     landing just as the slide finishes. */
+  animation: badgeSettle 0.82s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.16s;
 }
 @keyframes badgeSettle {
   from { transform: translateY(46vh) translateX(28vw) scale(0.82); opacity: 0; }
@@ -783,7 +808,7 @@ p { margin: 0; }
 .intel-badge-title { font-size: 14px; font-weight: 650; letter-spacing: -0.01em; }
 .intel-brief {
   font-size: 13.5px; color: var(--ink-3); max-width: 620px; line-height: 1.6;
-  animation: rowIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.34s;
+  animation: rowIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.6s;
 }
 .intel-back {
   position: absolute; left: 30px; top: 26px;

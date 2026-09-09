@@ -170,7 +170,7 @@ export default function Rail({
       {actionsOpen && anchor && (
         <div className="actions-pop" ref={popRef} style={{ left: anchor.left, top: anchor.top }} role="menu">
           <div className="actions-pop-head">{activeMonth?.label ?? month}</div>
-          {views.map((v) => {
+          {views.map((v, i) => {
             const Icon = v.icon;
             const disabled = v.needsPack && !hasPack;
             const active = v.id === view;
@@ -181,6 +181,8 @@ export default function Rail({
             return (
               <button
                 key={v.id}
+                // Drives the stagger — each item waits its turn before fading in.
+                style={{ '--i': i }}
                 className={`actions-item${active ? ' is-active' : ''}`}
                 disabled={disabled}
                 role="menuitem"
