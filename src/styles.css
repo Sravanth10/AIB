@@ -258,12 +258,16 @@ p { margin: 0; }
   padding: 10px 12px; border-radius: 12px; color: rgba(255, 255, 255, 0.88);
   transition: background 0.13s ease;
   opacity: 0;
-  animation: actionItemIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: calc(90ms + var(--i, 0) * 70ms);
+  animation: actionItemIn 0.42s cubic-bezier(0.18, 0.9, 0.3, 1) forwards;
+  /* The gap between items has to exceed a good fraction of each item's own duration,
+     otherwise all four overlap and the cascade reads as one soft blur rather than a
+     sequence. 130ms against a 420ms fade keeps them visibly distinct. */
+  animation-delay: calc(110ms + var(--i, 0) * 130ms);
 }
 @keyframes actionItemIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateX(-26px) scale(0.94); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: none; }
 }
 
 /* Respect a reduced-motion preference: show the menu, skip the choreography. */
